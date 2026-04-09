@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace 必须等于 Mapper 接口的全限定名 -->
+<mapper namespace="com.example.mapper.UserMapper">
+    <!-- 结果映射：解决数据库下划线字段与实体类驼峰属性的映射 -->
+    <resultMap id="UserResultMap" type="com.example.entity.User">
+        <id column="id" property="id"/> <!-- 主键映射 -->
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="create_time" property="createTime"/> <!-- 下划线转驼峰 -->
+    </resultMap>
+
+    <!-- 根据 ID 查询：使用 resultMap 映射结果 -->
+    <select id="selectById" resultMap="UserResultMap">
+        SELECT id, username, password, email, create_time
+        FROM user
+        WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有用户：复用 resultMap -->
+    <select id="selectAll" resultMap="UserResultMap">
+        SELECT id, username, password, email, create_time
+        FROM user
+    </select>
+
+    <!-- 新增用户：useGeneratedKeys 获取自增主键，keyProperty 映射到实体类属性 -->
+    <insert id="insertUser" parameterType="com.example.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (username, password, email)
+        VALUES (#{username}, #{password}, #{email})
+    </insert>
+</mapper>
