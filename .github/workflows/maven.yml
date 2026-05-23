@@ -1,0 +1,43 @@
+name: Maven CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0.33
+        env:
+          MYSQL_ROOT_PASSWORD: root123
+          MYSQL_DATABASE: mybatis_demo
+          MYSQL_USER: mybatis_user
+          MYSQL_PASSWORD: MyBatis@123456
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          java-version: "24"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Initialize database
+        run: mysql -h 127.0.0.1 -u root -proot123 < db/init.sql
+
+      - name: Build and verify
+        run: mvn -B verify

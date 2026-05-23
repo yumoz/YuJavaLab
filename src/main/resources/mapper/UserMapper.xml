@@ -32,4 +32,9 @@
         INSERT INTO user (username, password, email)
         VALUES (#{username}, #{password}, #{email})
     </insert>
+
+    <!-- 根据 ID 删除用户 -->
+    <delete id="deleteById">
+        DELETE FROM user WHERE id = #{id}
+    </delete>
 </mapper>

@@ -13,4 +13,7 @@ public interface UserMapper {
 
     // 新增用户
     int insertUser(User user);
+
+    // 根据 ID 删除用户（主要用于测试清理）
+    int deleteById(@Param("id") Integer id);
 }

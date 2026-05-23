@@ -10,7 +10,7 @@ public class User {
     private Date createTime; // 注意：数据库字段是 create_time，后续映射需处理
 
     // 无参构造（MyBatis 反射需要）
-    public User() {}
+    public User() { }
 
     // 有参构造（可选）
     public User(String username, String password, String email) {
