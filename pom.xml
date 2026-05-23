@@ -13,7 +13,7 @@
         <maven.compiler.target>24</maven.compiler.target>
         <mybatis.version>3.5.13</mybatis.version>
         <mysql.version>8.0.33</mysql.version>
-        <slf4j.version>2.0.9</slf4j.version>
+        <slf4j.version>2.0.18</slf4j.version>
         <logback.version>1.4.14</logback.version>
         <checkstyle.version>3.3.1</checkstyle.version>
         <spotbugs.version>4.8.6.6</spotbugs.version>
