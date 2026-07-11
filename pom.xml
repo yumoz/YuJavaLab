@@ -15,7 +15,7 @@
         <sqlite.version>3.46.0.0</sqlite.version>
         <slf4j.version>2.0.9</slf4j.version>
         <logback.version>1.4.14</logback.version>
-        <checkstyle.version>3.3.1</checkstyle.version>
+        <checkstyle.version>3.6.0</checkstyle.version>
         <spotbugs.version>4.8.6.6</spotbugs.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
