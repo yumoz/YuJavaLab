@@ -2,7 +2,7 @@
 
 ## Project
 
-Single-module Maven project (Java 24, MyBatis 3.5.13, MySQL 8.0.33). A learning demo for MyBatis CRUD with standard layered architecture.
+Single-module Maven project (Java 24, MyBatis 3.5.13, SQLite). A learning demo for MyBatis CRUD with standard layered architecture.
 
 ## Entry point
 
@@ -13,7 +13,7 @@ Single-module Maven project (Java 24, MyBatis 3.5.13, MySQL 8.0.33). A learning 
 ```bash
 mvn clean compile                                   # build
 mvn exec:java                                       # run (exec-maven-plugin configured)
-mvn test                                            # run tests (requires MySQL)
+mvn test                                            # run tests
 mvn verify                                          # test + checkstyle + spotbugs
 mvn checkstyle:check                                # code style only
 mvn spotbugs:check                                  # static analysis only
@@ -22,20 +22,13 @@ mvn mybatis-generator:generate                      # regenerate entity/mapper f
 
 ## Database
 
+SQLite — no server needed. The database file `yujavalab.db` is created automatically on first run.
+
 | File | Table fields | Match mapper? |
 |---|---|---|
 | `db/init.sql` | `username`, `password`, `email`, `create_time` | ✅ |
 
-Single source of truth. Run via Docker:
-```bash
-docker compose up -d
-# or manually:
-mysql -u root -p < db/init.sql
-```
-
-Edit `src/main/resources/mybatis-config.xml` credentials (default: `mybatis_user` / `MyBatis@123456`).
-
-**Tests require a running MySQL** — start Docker first.
+Schema is initialized via `DatabaseInit.init()` at application startup, which reads `db/init.sql` and executes it against `yujavalab.db`.
 
 ## Architecture
 
@@ -50,7 +43,8 @@ src/main/java/com/example/
 │   ├── UserService.java          # service interface
 │   └── impl/UserServiceImpl.java # service impl, opens/closes SqlSession
 └── util/
-    └── SqlSessionFactoryUtil.java # SqlSessionFactory singleton (DCL)
+    ├── SqlSessionFactoryUtil.java # SqlSessionFactory singleton (DCL)
+    └── DatabaseInit.java         # SQLite schema initializer
 ```
 
 ## Conventions
@@ -65,7 +59,7 @@ src/main/java/com/example/
 
 ## Tests
 
-`src/test/java/com/example/` — `UserMapperTest` (mapper-level) and `UserServiceTest` (service-level). Run with `mvn test` (MySQL must be up).
+`src/test/java/com/example/` — `UserMapperTest` (mapper-level) and `UserServiceTest` (service-level). Tests call `DatabaseInit.init()` in `@BeforeClass` to ensure schema exists.
 
 ## Code quality
 
@@ -73,4 +67,4 @@ Run `mvn verify` to execute Checkstyle (`checkstyle.xml` at root) and SpotBugs (
 
 ## MyBatis Generator
 
-Config: `src/main/resources/generator/generatorConfig.xml`. Run `mvn mybatis-generator:generate` after DB is up. `overwrite=false` — won't overwrite existing hand-written files.
+Config: `src/main/resources/generator/generatorConfig.xml`. Run `mvn mybatis-generator:generate` after DB is created. `overwrite=false` — won't overwrite existing hand-written files.

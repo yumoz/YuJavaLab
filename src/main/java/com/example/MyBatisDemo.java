@@ -3,31 +3,136 @@ package com.example;
 import com.example.entity.User;
 import com.example.service.UserService;
 import com.example.service.impl.UserServiceImpl;
+import com.example.util.DatabaseInit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class MyBatisDemo {
 
     private static final Logger log = LoggerFactory.getLogger(MyBatisDemo.class);
 
     public static void main(String[] args) {
+        DatabaseInit.init();
         UserService userService = new UserServiceImpl();
+        Scanner scanner = new Scanner(System.in);
 
-        // 测试 1：根据 ID 查询用户
-        User user = userService.selectById(1);
-        log.info("根据 ID 查询用户：{}", user);
+        while (true) {
+            System.out.println();
+            System.out.println("===== 用户管理系统 =====");
+            System.out.println("1. 查询所有用户");
+            System.out.println("2. 根据 ID 查询用户");
+            System.out.println("3. 控制台新增用户");
+            System.out.println("4. 从文件批量导入");
+            System.out.println("0. 退出");
+            System.out.print("请选择操作：");
 
-        // 测试 2：查询所有用户
-        List<User> userList = userService.selectAll();
-        log.info("查询所有用户：");
-        userList.forEach(u -> log.info("  {}", u));
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1":
+                    List<User> users = userService.selectAll();
+                    System.out.println("共 " + users.size() + " 条记录：");
+                    users.forEach(u -> System.out.println("  " + u));
+                    break;
+                case "2":
+                    System.out.print("请输入用户 ID：");
+                    try {
+                        int id = Integer.parseInt(scanner.nextLine().trim());
+                        User user = userService.selectById(id);
+                        if (user != null) {
+                            System.out.println("查询结果：" + user);
+                        } else {
+                            System.out.println("未找到 ID=" + id + " 的用户");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("请输入有效的数字 ID");
+                    }
+                    break;
+                case "3":
+                    insertFromConsole(scanner, userService);
+                    break;
+                case "4":
+                    importFromFile(scanner, userService);
+                    break;
+                case "0":
+                    System.out.println("再见！");
+                    return;
+                default:
+                    System.out.println("无效选项，请重新输入");
+            }
+        }
+    }
 
-        // 测试 3：新增用户
-        User newUser = new User("wangx", "987654", "wangx@example.com");
-        int rows = userService.insertUser(newUser);
-        log.info("新增用户影响行数：{}", rows);
-        log.info("新增用户的自增 ID：{}", newUser.getId());
+    private static void insertFromConsole(Scanner scanner, UserService userService) {
+        System.out.print("用户名：");
+        String username = scanner.nextLine().trim();
+        System.out.print("密码：");
+        String password = scanner.nextLine().trim();
+        System.out.print("邮箱：");
+        String email = scanner.nextLine().trim();
+
+        if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+            System.out.println("用户名、密码、邮箱不能为空");
+            return;
+        }
+
+        User user = new User(username, password, email);
+        int rows = userService.insertUser(user);
+        System.out.println("新增成功，影响行数：" + rows + "，ID：" + user.getId());
+    }
+
+    private static void importFromFile(Scanner scanner, UserService userService) {
+        System.out.print("请输入文件路径（支持 CSV，格式：username,password,email）：");
+        String filePath = scanner.nextLine().trim();
+
+        Path path = Paths.get(filePath);
+        if (!Files.exists(path)) {
+            System.out.println("文件不存在：" + filePath);
+            return;
+        }
+
+        List<User> users = new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            String line;
+            boolean firstLine = true;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
+                if (firstLine) {
+                    firstLine = false;
+                    if (line.toLowerCase().startsWith("username")) {
+                        continue;
+                    }
+                }
+                String[] parts = line.split(",");
+                if (parts.length < 3) {
+                    System.out.println("跳过格式错误的行：" + line);
+                    continue;
+                }
+                users.add(new User(parts[0].trim(), parts[1].trim(), parts[2].trim()));
+            }
+        } catch (IOException e) {
+            System.out.println("读取文件失败：" + e.getMessage());
+            return;
+        }
+
+        if (users.isEmpty()) {
+            System.out.println("文件中没有有效的用户数据");
+            return;
+        }
+
+        int rows = userService.insertBatch(users);
+        System.out.println("批量导入完成，共导入 " + rows + " 条记录");
     }
 }

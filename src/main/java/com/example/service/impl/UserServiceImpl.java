@@ -44,6 +44,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public int insertBatch(List<User> list) {
+        log.debug("Batch inserting {} users", list.size());
+        try (SqlSession session = SqlSessionFactoryUtil.getSqlSessionFactory().openSession(true)) {
+            UserMapper mapper = session.getMapper(UserMapper.class);
+            int rows = mapper.insertBatch(list);
+            log.info("Batch inserted {} rows", rows);
+            return rows;
+        }
+    }
+
+    @Override
     public void deleteById(Integer id) {
         log.debug("Deleting user by id: {}", id);
         try (SqlSession session = SqlSessionFactoryUtil.getSqlSessionFactory().openSession(true)) {

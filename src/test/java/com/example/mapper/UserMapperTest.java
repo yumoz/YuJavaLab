@@ -1,10 +1,12 @@
 package com.example.mapper;
 
 import com.example.entity.User;
+import com.example.util.DatabaseInit;
 import com.example.util.SqlSessionFactoryUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
@@ -16,6 +18,11 @@ public class UserMapperTest {
 
     private SqlSession session;
     private UserMapper userMapper;
+
+    @BeforeClass
+    public static void initDb() {
+        DatabaseInit.init();
+    }
 
     @Before
     public void setUp() {

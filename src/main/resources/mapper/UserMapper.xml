@@ -33,6 +33,14 @@
         VALUES (#{username}, #{password}, #{email})
     </insert>
 
+    <!-- 批量新增用户 -->
+    <insert id="insertBatch" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (username, password, email) VALUES
+        <foreach collection="list" item="user" separator=",">
+            (#{user.username}, #{user.password}, #{user.email})
+        </foreach>
+    </insert>
+
     <!-- 根据 ID 删除用户 -->
     <delete id="deleteById">
         DELETE FROM user WHERE id = #{id}

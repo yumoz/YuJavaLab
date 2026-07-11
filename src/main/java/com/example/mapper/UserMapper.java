@@ -14,6 +14,9 @@ public interface UserMapper {
     // 新增用户
     int insertUser(User user);
 
+    // 批量新增用户
+    int insertBatch(@Param("list") List<User> list);
+
     // 根据 ID 删除用户（主要用于测试清理）
     int deleteById(@Param("id") Integer id);
 }

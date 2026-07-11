@@ -2,6 +2,8 @@ package com.example.service;
 
 import com.example.entity.User;
 import com.example.service.impl.UserServiceImpl;
+import com.example.util.DatabaseInit;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
@@ -10,6 +12,11 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 
 public class UserServiceTest {
+
+    @BeforeClass
+    public static void initDb() {
+        DatabaseInit.init();
+    }
 
     private final UserService userService = new UserServiceImpl();
 

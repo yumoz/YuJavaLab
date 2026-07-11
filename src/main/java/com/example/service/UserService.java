@@ -11,5 +11,7 @@ public interface UserService {
 
     int insertUser(User user);
 
+    int insertBatch(List<User> list);
+
     void deleteById(Integer id);
 }
