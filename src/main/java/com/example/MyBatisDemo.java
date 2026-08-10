@@ -1,9 +1,16 @@
 package com.example;
 
+import com.example.entity.Order;
 import com.example.entity.User;
+import com.example.entity.UserQuery;
+import com.example.service.AccountService;
+import com.example.service.OrderService;
 import com.example.service.UserService;
+import com.example.service.impl.AccountServiceImpl;
+import com.example.service.impl.OrderServiceImpl;
 import com.example.service.impl.UserServiceImpl;
 import com.example.util.DatabaseInit;
+import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +30,8 @@ public class MyBatisDemo {
 
     public static void main(String[] args) {
         DatabaseInit.init();
+        AccountService accountService = new AccountServiceImpl();
+        OrderService orderService = new OrderServiceImpl();
         UserService userService = new UserServiceImpl();
         Scanner scanner = new Scanner(System.in);
 
@@ -33,6 +42,11 @@ public class MyBatisDemo {
             System.out.println("2. 根据 ID 查询用户");
             System.out.println("3. 控制台新增用户");
             System.out.println("4. 从文件批量导入");
+            System.out.println("5. 动态条件查询");
+            System.out.println("6. 分页查询（PageHelper）");
+            System.out.println("7. 账户转账（事务）");
+            System.out.println("8. 查看用户+订单（多表）");
+            System.out.println("9. 查看订单（按用户）");
             System.out.println("0. 退出");
             System.out.print("请选择操作：");
 
@@ -62,6 +76,21 @@ public class MyBatisDemo {
                     break;
                 case "4":
                     importFromFile(scanner, userService);
+                    break;
+                case "5":
+                    dynamicQuery(scanner, userService);
+                    break;
+                case "6":
+                    pageQuery(scanner, userService);
+                    break;
+                case "7":
+                    transfer(scanner, accountService);
+                    break;
+                case "8":
+                    userWithOrders(scanner, userService);
+                    break;
+                case "9":
+                    ordersByUser(scanner, orderService);
                     break;
                 case "0":
                     System.out.println("再见！");
@@ -134,5 +163,62 @@ public class MyBatisDemo {
 
         int rows = userService.insertBatch(users);
         System.out.println("批量导入完成，共导入 " + rows + " 条记录");
+    }
+
+    private static void dynamicQuery(Scanner scanner, UserService userService) {
+        System.out.print("用户名关键字（可空）：");
+        String username = scanner.nextLine().trim();
+        UserQuery query = new UserQuery();
+        query.setUsername(username);
+        List<User> users = userService.selectByCondition(query);
+        System.out.println("共 " + users.size() + " 条记录：");
+        users.forEach(u -> System.out.println("  " + u));
+    }
+
+    private static void pageQuery(Scanner scanner, UserService userService) {
+        System.out.print("页码：");
+        int pageNum = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("每页条数：");
+        int pageSize = Integer.parseInt(scanner.nextLine().trim());
+        PageInfo<User> page = userService.selectPageByHelper(pageNum, pageSize);
+        System.out.println("第 " + page.getPageNum() + " 页，共 " + page.getTotal() + " 条：");
+        page.getList().forEach(u -> System.out.println("  " + u));
+    }
+
+    private static void transfer(Scanner scanner, AccountService accountService) {
+        System.out.print("转出账户ID：");
+        int fromId = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("转入账户ID：");
+        int toId = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("金额：");
+        double amount = Double.parseDouble(scanner.nextLine().trim());
+        try {
+            accountService.transfer(fromId, toId, amount);
+            System.out.println("转账成功");
+        } catch (RuntimeException e) {
+            System.out.println("转账失败：" + e.getMessage());
+        }
+    }
+
+    private static void userWithOrders(Scanner scanner, UserService userService) {
+        System.out.print("用户ID：");
+        int id = Integer.parseInt(scanner.nextLine().trim());
+        User user = userService.selectUserWithOrders(id);
+        if (user == null) {
+            System.out.println("用户不存在");
+            return;
+        }
+        System.out.println(user);
+        if (user.getOrders() != null) {
+            user.getOrders().forEach(o -> System.out.println("  订单: " + o));
+        }
+    }
+
+    private static void ordersByUser(Scanner scanner, OrderService orderService) {
+        System.out.print("用户ID：");
+        int userId = Integer.parseInt(scanner.nextLine().trim());
+        List<Order> orders = orderService.selectByUserId(userId);
+        System.out.println("共 " + orders.size() + " 条订单：");
+        orders.forEach(o -> System.out.println("  " + o));
     }
 }

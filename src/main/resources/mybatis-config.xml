@@ -4,19 +4,34 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+    <typeHandlers>
+        <typeHandler handler="com.example.typehandler.UserTypeTypeHandler" javaType="com.example.entity.UserType"/>
+    </typeHandlers>
+
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <property name="helperDialect" value="sqlite"/>
+            <property name="reasonable" value="true"/>
+        </plugin>
+        <plugin interceptor="com.example.interceptor.CreateTimeInterceptor"/>
+    </plugins>
+
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>
-            <dataSource type="POOLED">
-                <property name="driver" value="org.sqlite.JDBC"/>
-                <property name="url" value="jdbc:sqlite:yujavalab.db"/>
+            <dataSource type="com.example.datasource.HikariDataSourceFactory">
+                <property name="driverClassName" value="org.sqlite.JDBC"/>
+                <property name="jdbcUrl" value="jdbc:sqlite:yujavalab.db"/>
                 <property name="username" value=""/>
                 <property name="password" value=""/>
+                <property name="maximumPoolSize" value="5"/>
             </dataSource>
         </environment>
     </environments>
 
     <mappers>
         <mapper resource="mapper/UserMapper.xml"/>
+        <mapper resource="mapper/OrderMapper.xml"/>
+        <mapper resource="mapper/AccountMapper.xml"/>
     </mappers>
 </configuration>

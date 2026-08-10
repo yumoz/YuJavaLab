@@ -1,13 +1,16 @@
 package com.example.entity;
 
 import java.util.Date;
+import java.util.List;
 
 public class User {
     private Integer id;
     private String username;
     private String password;
     private String email;
+    private UserType userType = UserType.NORMAL;
     private Date createTime; // 注意：数据库字段是 create_time，后续映射需处理
+    private List<Order> orders;
 
     // 无参构造（MyBatis 反射需要）
     public User() { }
@@ -28,8 +31,12 @@ public class User {
     public void setPassword(String password) { this.password = password; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public UserType getUserType() { return userType; }
+    public void setUserType(UserType userType) { this.userType = userType; }
     public Date getCreateTime() { return createTime; }
     public void setCreateTime(Date createTime) { this.createTime = createTime; }
+    public List<Order> getOrders() { return orders; }
+    public void setOrders(List<Order> orders) { this.orders = orders; }
 
     // toString 方法
     @Override

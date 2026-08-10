@@ -16,7 +16,7 @@
         <slf4j.version>2.0.9</slf4j.version>
         <logback.version>1.4.14</logback.version>
         <checkstyle.version>3.3.1</checkstyle.version>
-        <spotbugs.version>4.8.6.6</spotbugs.version>
+        <spotbugs.version>4.10.3.0</spotbugs.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -47,6 +47,28 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+
+        <!-- 连接池 -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.1.0</version>
+        </dependency>
+
+        <!-- 分页插件 -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>5.3.3</version>
+        </dependency>
+
+        <!-- Mockito 单元测试 -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.23.0</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- JUnit 测试 -->
