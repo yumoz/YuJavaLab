@@ -10,22 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0.33
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: mybatis_demo
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
       - uses: actions/checkout@v4
 
@@ -36,8 +20,7 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      - name: Initialize database
-        run: mysql -h 127.0.0.1 -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" < db/init.sql
-
+      # 项目使用嵌入式 SQLite（无需数据库服务），测试进程经 surefire 使用 target/test.db，
+      # 与主库隔离，无需任何 service 容器。
       - name: Build and verify
         run: mvn -B verify

@@ -15,8 +15,12 @@ public class DatabaseInit {
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseInit.class);
 
+    /** 默认数据库 URL；可通过系统属性 app.db.url 覆盖（测试用 target/test.db 与主库隔离）。 */
+    public static final String DEFAULT_DB_URL = "jdbc:sqlite:yujavalab.db";
+
     public static void init() {
-        String url = "jdbc:sqlite:yujavalab.db";
+        String url = System.getProperty("app.db.url", DEFAULT_DB_URL);
+        // 注意：此处 URL 必须与 SqlSessionFactoryUtil 注入 mybatis-config.xml 的 ${app.db.url} 保持一致
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement();
              InputStream is = DatabaseInit.class.getResourceAsStream("/db/init.sql");

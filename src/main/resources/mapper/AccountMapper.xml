@@ -17,9 +17,17 @@
         WHERE id = #{id}
     </select>
 
-    <update id="updateBalance">
+    <!-- 原子扣减：WHERE 带余额条件，余额不足时影响行数为 0，防止并发超扣 -->
+    <update id="debit">
         UPDATE account
-        SET balance = #{balance}
+        SET balance = balance - #{amount}
+        WHERE id = #{id} AND balance >= #{amount}
+    </update>
+
+    <!-- 原子增额：并发转账到同一账户时结果仍正确 -->
+    <update id="credit">
+        UPDATE account
+        SET balance = balance + #{amount}
         WHERE id = #{id}
     </update>
 </mapper>

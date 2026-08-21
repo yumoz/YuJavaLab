@@ -4,6 +4,11 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+    <settings>
+        <!-- 显式指定日志实现为 SLF4J，便于在 logback 中查看动态 SQL/参数/缓存命中日志 -->
+        <setting name="logImpl" value="SLF4J"/>
+    </settings>
+
     <typeHandlers>
         <typeHandler handler="com.example.typehandler.UserTypeTypeHandler" javaType="com.example.entity.UserType"/>
     </typeHandlers>
@@ -21,7 +26,8 @@
             <transactionManager type="JDBC"/>
             <dataSource type="com.example.datasource.HikariDataSourceFactory">
                 <property name="driverClassName" value="org.sqlite.JDBC"/>
-                <property name="jdbcUrl" value="jdbc:sqlite:yujavalab.db"/>
+                <!-- ${app.db.url} 由 SqlSessionFactoryUtil 在 build 时注入系统属性（默认 jdbc:sqlite:yujavalab.db） -->
+                <property name="jdbcUrl" value="${app.db.url}"/>
                 <property name="username" value=""/>
                 <property name="password" value=""/>
                 <property name="maximumPoolSize" value="5"/>

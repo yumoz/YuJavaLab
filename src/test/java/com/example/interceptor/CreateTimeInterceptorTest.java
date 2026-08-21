@@ -21,16 +21,17 @@ public class CreateTimeInterceptorTest {
         assertNull(user.getCreateTime());
 
         Executor executor = mock(Executor.class);
-        MappedStatement ms = mock(MappedStatement.class);
-        when(executor.update(ms, user)).thenReturn(1);
+        when(executor.update(null, user)).thenReturn(1);
 
         CreateTimeInterceptor interceptor = new CreateTimeInterceptor();
+        // MappedStatement 是 final 类，subclass mock maker 无法 mock；
+        // 拦截器只读取 args[1]（实体），args[0] 用 null 占位即可，不影响测试意图
         Object result = interceptor.intercept(new Invocation(
                 executor, Executor.class.getMethod("update", MappedStatement.class, Object.class),
-                new Object[]{ms, user}));
+                new Object[]{null, user}));
 
         assertEquals(1, result);
         assertNotNull(user.getCreateTime());
-        verify(executor).update(ms, user);
+        verify(executor).update(null, user);
     }
 }

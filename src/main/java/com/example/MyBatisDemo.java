@@ -3,6 +3,7 @@ package com.example;
 import com.example.entity.Order;
 import com.example.entity.User;
 import com.example.entity.UserQuery;
+import com.example.exception.BizException;
 import com.example.service.AccountService;
 import com.example.service.OrderService;
 import com.example.service.UserService;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -191,11 +193,14 @@ public class MyBatisDemo {
         System.out.print("转入账户ID：");
         int toId = Integer.parseInt(scanner.nextLine().trim());
         System.out.print("金额：");
-        double amount = Double.parseDouble(scanner.nextLine().trim());
+        String amountText = scanner.nextLine().trim();
         try {
+            BigDecimal amount = new BigDecimal(amountText);
             accountService.transfer(fromId, toId, amount);
             System.out.println("转账成功");
-        } catch (RuntimeException e) {
+        } catch (NumberFormatException e) {
+            System.out.println("请输入有效的金额数字");
+        } catch (BizException e) {
             System.out.println("转账失败：" + e.getMessage());
         }
     }

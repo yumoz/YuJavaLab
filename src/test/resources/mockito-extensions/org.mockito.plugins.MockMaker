@@ -1,0 +1,6 @@
+# 本机 dev box 是 JDK 25：Mockito 5.x 默认的 inline mock maker 依赖 byte-buddy 的 agent self-attach，
+# 在 Windows + JDK 25 上会报 "Could not self-attach to current VM using external process"。
+# 本项目测试只 mock 接口（PreparedStatement/ResultSet/Executor/MappedStatement），
+# 切换为 subclass mock maker 即可，无需 agent attach。
+# 若未来需要 mock final 类/方法，再考虑升级 byte-buddy 或换用 inline maker。
+mock-maker-subclass

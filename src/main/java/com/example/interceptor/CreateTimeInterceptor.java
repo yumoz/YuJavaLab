@@ -15,6 +15,17 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * 拦截 {@link Executor#update}，自动填充实体的 {@code createTime} 字段（为空时才填）。
+ *
+ * 教学实现取舍与局限：
+ * - 通过反射按固定字段名 "createTime" 定位；遇 Map 参数（如 {@code @Param("list")}）时
+ *   按包名前缀 "com.example.entity." 识别实体 —— 仅适配本项目结构。
+ *   更稳的做法：依据 {@link MappedStatement#getParameterType()} 或自定义注解定位实体。
+ * - 不区分 insert/update：只要 createTime 为空就填充。update 场景若不希望改写，
+ *   可通过 statement.getId() 判断是否 insert 语句后再填。
+ * - 实体需提供可写（setAccessible）的 createTime 字段；缺失时静默跳过并记 DEBUG。
+ */
 @Intercepts({
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})
 })

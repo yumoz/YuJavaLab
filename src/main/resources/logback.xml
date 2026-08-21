@@ -7,6 +7,10 @@
     </appender>
 
     <logger name="com.example" level="DEBUG"/>
+    <!-- org.apache.ibatis 开到 DEBUG 后可在控制台看到：
+        动态 SQL 最终拼装结果、参数绑定、PageHelper 分页改写后的 SQL、二级缓存命中/未命中 -->
+    <logger name="org.apache.ibatis" level="DEBUG"/>
+    <!-- org.mybatis 包（SqlSession/Mapper 代理层）保持 INFO，避免刷屏 -->
     <logger name="org.mybatis" level="INFO"/>
 
     <root level="WARN">

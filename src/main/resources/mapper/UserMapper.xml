@@ -62,6 +62,9 @@
                 <when test="userType != null">
                     AND user_type = #{userType}
                 </when>
+                <!-- userType 为 null 时的兜底：只返回有类型标记的用户（非 NULL）。
+                     注意：这里并非"不限类型"，而是排除类型为空的脏数据；
+                     若业务语义是"不按类型过滤"，请删除该 otherwise 分支。 -->
                 <otherwise>
                     AND user_type IS NOT NULL
                 </otherwise>
